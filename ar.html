@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Robot Kick Ball - Snow Scene</title>
+  <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
+  <style>body { margin:0; }</style>
+</head>
+
+<body>
+
+<a-scene>
+
+  <!-- FIXED CAMERA + CURSOR UNTUK PC & HP -->
+  <a-entity camera look-controls>
+    <a-cursor rayOrigin="mouse" fuse="false" raycaster="objects: .clickable"></a-cursor>
+  </a-entity>
+
+  <!-- BLUE SKY -->
+  <a-sky color="#1A3DFF"></a-sky>
+
+  <!-- SNOW SYSTEM -->
+  <a-entity id="snow"></a-entity>
+
+  <script>
+    AFRAME.registerComponent('snowfall', {
+      init: function () {
+        const scene = this.el;
+        for (let i = 0; i < 250; i++) {
+          let flake = document.createElement("a-sphere");
+          flake.setAttribute("radius", Math.random() * 0.03 + 0.01);
+          flake.setAttribute("color", "#FFFFFF");
+
+          let x = (Math.random() * 20) - 10;
+          let y = Math.random() * 10 + 3;
+          let z = (Math.random() * -10);
+
+          flake.setAttribute("position", `${x} ${y} ${z}`);
+          flake.setAttribute("animation", `
+            property: position;
+            to: ${x} -2 ${z};
+            dur: ${3000 + Math.random() * 2000};
+            loop: true;
+          `);
+
+          scene.appendChild(flake);
+        }
+      }
+    });
+
+    document.querySelector("#snow").setAttribute("snowfall", "");
+  </script>
+
+  <!-- MOON -->
+  <a-entity position="-3 4 -8">
+    <a-sphere radius="0.8" color="#FFFFFF"></a-sphere>
+    <a-sphere radius="0.7" position="0.3 0 0" color="#1A3DFF"></a-sphere>
+  </a-entity>
+
+  <!-- GROUND -->
+  <a-plane rotation="-90 0 0" width="50" height="50" color="#E6F0FF"></a-plane>
+
+  <!-- BALL -->
+  <a-sphere id="ball" radius="0.3" color="#FFDD00" position="0 2 -2"></a-sphere>
+
+  <!-- ROBOT -->
+  <a-entity id="robot" class="clickable" position="-1 0.8 -2" scale="1.2 1.2 1.2">
+
+    <!-- BODY -->
+    <a-box width="0.9" height="1" depth="0.6"
+           material="color:#00FFFF; emissive:#00FFFF; emissiveIntensity:1"
+           position="0 0.6 0"></a-box>
+
+    <!-- HEAD -->
+    <a-sphere radius="0.45" position="0 1.45 0"
+              material="color:#FFFF44; emissive:#FFFF44; emissiveIntensity:1"></a-sphere>
+
+    <!-- EYES -->
+    <a-sphere radius="0.1" position="-0.18 1.55 0.35"
+              material="color:#00FFFF; emissive:#00FFFF; emissiveIntensity:2"></a-sphere>
+    <a-sphere radius="0.1" position="0.18 1.55 0.35"
+              material="color:#00FFFF; emissive:#00FFFF; emissiveIntensity:2"></a-sphere>
+
+    <!-- LEFT LEG -->
+    <a-cylinder id="kickLeg"
+                radius="0.12" height="0.9"
+                position="-0.3 0.2 0"
+                material="color:#008CFF; emissive:#008CFF; emissiveIntensity:1"></a-cylinder>
+
+    <!-- RIGHT LEG -->
+    <a-cylinder radius="0.12" height="0.9"
+                position="0.3 0.2 0"
+                material="color:#008CFF; emissive:#008CFF; emissiveIntensity:1"></a-cylinder>
+
+  </a-entity>
+
+</a-scene>
+
+<!-- BOUNCE BALL -->
+<script>
+  const ball = document.querySelector("#ball");
+
+  function bounceLoop() {
+    ball.setAttribute("animation__fall", {
+      property: "position",
+      to: `0 0.3 -2`,
+      dur: 600,
+      easing: "easeInQuad"
+    });
+
+    setTimeout(() => {
+      ball.setAttribute("animation__up1", {
+        property: "position",
+        to: `0 1.3 -2`,
+        dur: 600,
+        easing: "easeOutQuad"
+      });
+    }, 650);
+
+    setTimeout(() => {
+      ball.setAttribute("animation__fall2", {
+        property: "position",
+        to: `0 0.3 -2`,
+        dur: 500,
+        easing: "easeInQuad"
+      });
+    }, 1300);
+
+    setTimeout(() => {
+      ball.setAttribute("animation__up2", {
+        property: "position",
+        to: `0 0.9 -2`,
+        dur: 400,
+        easing: "easeOutQuad"
+      });
+    }, 1800);
+
+    setTimeout(() => {
+      ball.setAttribute("animation__fall3", {
+        property: "position",
+        to: `0 0.3 -2`,
+        dur: 300,
+        easing: "easeInQuad"
+      });
+    }, 2300);
+
+    setTimeout(bounceLoop, 2600);
+  }
+
+  bounceLoop();
+</script>
+
+<!-- ROBOT KICK -->
+<script>
+  const robot = document.querySelector("#robot");
+  const kickLeg = document.querySelector("#kickLeg");
+
+  robot.addEventListener("click", () => {
+
+    kickLeg.setAttribute("animation__kick", {
+      property: "rotation",
+      from: "0 0 0",
+      to: "0 0 -40",
+      dur: 200,
+      dir: "alternate"
+    });
+
+    ball.setAttribute("animation__kickball", {
+      property: "position",
+      to: "3 0.3 -6",
+      dur: 600,
+      easing: "easeOutQuad"
+    });
+
+    setTimeout(() => {
+      ball.setAttribute("animation__return", {
+        property: "position",
+        to: "0 2 -2",
+        dur: 1000,
+        easing: "easeOutQuad"
+      });
+    }, 1200);
+
+  });
+</script>
+
+</body>
+</html>
